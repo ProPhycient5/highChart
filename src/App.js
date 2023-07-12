@@ -281,20 +281,23 @@ const channels = [
   },
 ];
 
-
 const engagementMessageOverTimeChartOptions = (messageCountList, channels) => {
   // Filter channels that have messages for more than one date
-  const multiDateChannels = channels.filter((channel) => {
+  const multiDateChannels = channels.filter((channel, idx) => {
     const channelId = channel.value;
     const messageDates = messageCountList
       .filter((message) => message.channelId === channelId)
       .map((message) => message.timeBucket);
+
+    console.log("messageDates_teyw", idx, messageDates);
+    // Check if there are multiple unique dates
     const uniqueDates = [...new Set(messageDates)];
-    return uniqueDates.length > 1;
+    const hasMultipleDates = uniqueDates.length > 1;
+
+    return hasMultipleDates; //what is the purpose of this line ?
   });
 
   console.log("multiDateChannels_exc", multiDateChannels);
-
 
   // Generate series data for channels with multiple dates
   const seriesData = multiDateChannels.map((channel) => {
@@ -318,10 +321,10 @@ const engagementMessageOverTimeChartOptions = (messageCountList, channels) => {
 
   // Create Highcharts chart options
   const options = {
-    chart: { type: "spline"},
-    title: { text: "Engagement: Messages Over Time"},
-    xAxis: { type: "datetime", title: {text: "Date"}},
-    yAxis: {title: {text: "Message Count",},},
+    chart: { type: "spline" },
+    title: { text: "Engagement: Messages Over Time" },
+    xAxis: { type: "datetime", title: { text: "Date" } },
+    yAxis: { title: { text: "Message Count" } },
     tooltip: {
       formatter: function () {
         return `<b>${this.series.name}</b><br/>Date: ${Highcharts.dateFormat(
@@ -337,10 +340,11 @@ const engagementMessageOverTimeChartOptions = (messageCountList, channels) => {
   return options;
 };
 
-
-
 function App() {
-  const options = engagementMessageOverTimeChartOptions( messageCountList, channels);
+  const options = engagementMessageOverTimeChartOptions(
+    messageCountList,
+    channels
+  );
   return (
     <div>
       <HighchartsReact highcharts={Highcharts} options={options} />
